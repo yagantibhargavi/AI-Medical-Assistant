@@ -1,65 +1,228 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import { doctors } from "../data/doctors";
 
 export default function Home() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+
+  const [patient, setPatient] = useState<any>(null);
+
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    dob: "",
+    phone: "",
+    email: "",
+    reason: ""
+  });
+
+  const [messages, setMessages] = useState([
+  { role: "assistant", content: "Hello, please describe your symptoms." }
+]);
+
+const [input, setInput] = useState("");
+const [selectedDoctor, setSelectedDoctor] = useState<any>(null);
+const [appointment, setAppointment] = useState<any>(null);
+
+ const handleSubmit = () => {
+    setPatient(form);
+  };
+
+  if (!patient) {
+    return (
+      <div className="p-10 text-white">
+
+        <h1 className="text-2xl mb-6">
+          Kyron Medical Patient Intake
+        </h1>
+
+       <input
+  placeholder="First Name"
+  value={form.firstName}
+  className="border border-gray-400 bg-white text-black p-2 rounded w-full mb-3"
+  onChange={(e) =>
+    setForm({ ...form, firstName: e.target.value })
+  }
+/>
+          <input
+          placeholder="Last Name"
+          value={form.lastName}
+          className="border border-gray-400 bg-white text-black p-2 rounded w-full mb-3"
+          onChange={(e) =>
+            setForm({ ...form, lastName: e.target.value })
+          }
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+
+        <input
+          placeholder="DOB"
+          value={form.dob}
+          className="border border-gray-400 bg-white text-black p-2 rounded w-full mb-3"
+          onChange={(e) =>
+            setForm({ ...form, dob: e.target.value })
+          }
+        />
+
+        <input
+          placeholder="Phone"
+          value={form.phone}
+          className="border border-gray-400 bg-white text-black p-2 rounded w-full mb-3"
+          onChange={(e) =>
+            setForm({ ...form, phone: e.target.value })
+          }
+        />
+
+        <input
+          placeholder="Email"
+          value={form.email}
+          className="border border-gray-400 bg-white text-black p-2 rounded w-full mb-3"
+          onChange={(e) =>
+            setForm({ ...form, email: e.target.value })
+          }
+        />
+
+        <input
+          placeholder="Reason for Appointment"
+          value={form.reason}
+          className="border border-gray-400 bg-white text-black p-2 rounded w-full mb-3"
+          onChange={(e) =>
+            setForm({ ...form, reason: e.target.value })
+          }
+        />
+
+        <button 
+        className="bg-blue-600 text-white px-4 py-2 rounded mt-3"
+        onClick={handleSubmit}>
+          Start Chat
+        </button>
+
+      </div>
+    );
+  }
+
+  const symptomMap: any = {
+  heart: ["chest pain", "heart pain", "palpitations"],
+  knee: ["knee pain", "leg injury", "joint pain"],
+  skin: ["rash", "itching", "acne"],
+  eye: ["blurry vision", "eye pain", "vision problem"]
+};
+
+const handleSend = async () => {
+  if (!input.trim()) return;
+
+  const userMessage = input.toLowerCase();
+
+  const res = await fetch("/api/analyze", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({ message: input }),
+})
+
+const data = await res.json()
+
+const doctor = doctors.find(
+  (d) => d.specialty.toLowerCase().includes(data.specialty)
+);
+let response = "No matching doctor found.";
+
+if (doctor) {
+  setSelectedDoctor(doctor)
+
+  response =
+    `You should see ${doctor.name} (${doctor.specialty}).\n\nAvailable times:\n` +
+    doctor.availability.join("\n")
+}
+  setMessages([
+    ...messages,
+    { role: "user", content: input },
+    { role: "assistant", content: response }
+  ]);
+
+  setInput("");
+};
+
+const handleBooking = () => {
+  if (!selectedDoctor) return;
+
+  const time = selectedDoctor.availability[0];
+
+  setAppointment({
+    doctor: selectedDoctor.name,
+    time: time
+  });
+};
+
+return (
+ <div className="p-10 text-white">
+
+<h2 className="text-xl mb-4">Welcome</h2>
+
+<div className="border p-4 h-48 mb-4">
+  {messages.map((m, i) => (
+    <div key={i}>
+      <b>{m.role === "assistant" ? "AI Assistant" : "You"}:</b> {m.content}
     </div>
-  );
+  ))}
+</div>
+
+<input
+  type="text"
+  value={input}
+  onChange={(e) => setInput(e.target.value)}
+  placeholder="Describe your symptoms..."
+  className="border border-gray-400 bg-white text-black p-2 rounded w-full mb-3"
+/>
+<button
+  className="bg-blue-600 px-4 py-2 mt-2 rounded"
+  onClick={handleSend}
+>
+Send
+</button>
+
+
+    {/* Doctor Card */}
+    {selectedDoctor && (
+      <div className="border p-4 rounded mt-6 bg-gray-900 text-white w-96">
+
+        <h2 className="text-xl font-bold">
+          {selectedDoctor.name}
+        </h2>
+
+        <p className="mb-2 capitalize">
+          {selectedDoctor.specialty} Specialist
+        </p>
+
+        <p className="font-semibold">Available Times:</p>
+
+        <ul className="mb-3">
+          {selectedDoctor.availability.map((time: string, i: number) => (
+            <li key={i}>{time}</li>
+          ))}
+        </ul>
+        {appointment && (
+  <div className="mt-6 p-4 border rounded bg-green-900 w-96">
+
+    <h2 className="text-xl font-bold">
+      Appointment Confirmed
+    </h2>
+
+    <p>Doctor: {appointment.doctor}</p>
+
+    <p>Time: {appointment.time}</p>
+
+  </div>
+)}
+
+        <button 
+        onClick={handleBooking}
+        className="bg-blue-600 px-4 py-2 rounded">
+          Book Appointment
+        </button>
+
+      </div>
+    )}
+
+  </div>
+);
 }
