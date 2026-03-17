@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Medical Assistant
 
-## Getting Started
+An AI-powered medical assistant that helps patients describe symptoms, recommends doctors, books appointments, and allows continuing the conversation through voice.
 
-First, run the development server:
+## Features
 
-```bash
+* AI symptom analysis through chat
+* Doctor recommendation based on symptoms
+* Appointment booking system
+* Email confirmation for appointments
+* Voice AI conversation that continues the chat context
+
+## Technologies Used
+
+* Next.js
+* TypeScript
+* JavaScript
+* GROQ API
+* Vapi (Voice AI)
+* Resend (Email API)
+* Tailwind CSS
+
+## How It Works
+
+1. The user describes their symptoms in the chat.
+2. The AI analyzes the symptoms and recommends a doctor.
+3. The user books an appointment.
+4. A confirmation email is sent to the patient.
+5. The user can continue the conversation with the AI using voice.
+
+## Running the Project Locally
+
+Install dependencies:
+
+npm install
+
+Run the development server:
+
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+http://localhost:3000
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project Structure
 
-## Learn More
+app/
 
-To learn more about Next.js, take a look at the following resources:
+* page.tsx – Main UI
+* api/analyze – AI symptom analysis
+* api/send-email – Email confirmation
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+doctors.ts – Doctor data and availability
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Future Improvements
 
-## Deploy on Vercel
+* Real doctor database integration
+* Calendar scheduling
+* Medical history storage
+* Video consultation
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Author
+Bhargavi 
