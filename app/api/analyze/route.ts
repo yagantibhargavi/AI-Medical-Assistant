@@ -29,7 +29,7 @@ export async function POST(req: Request) {
 
   const data = await response.json();
 
-    //  SAFETY CHECK (prevents crash)
+
     if (!data || !data.choices || !data.choices[0]) {
       return NextResponse.json({
         doctor: "Dr. Default",
@@ -39,15 +39,25 @@ export async function POST(req: Request) {
     }
 
     const specialty =
-      data.choices[0].message?.content?.trim() || "General Medicine";
+  data.choices[0].message?.content?.trim() || "General Medicine";
 
-    //  SAFE MATCHING
-    const doctor = doctors.find(
-      (doc) =>
-        doc.specialty.toLowerCase() === (specialty || "").toLowerCase()
-    );
+let mappedSpecialty = (specialty || "").toLowerCase();
 
-    //  FALLBACK IF NO MATCH
+if (mappedSpecialty.includes("heart") || mappedSpecialty.includes("cardio")) {
+  mappedSpecialty = "cardiology";
+}
+
+if (mappedSpecialty.includes("skin")) {
+  mappedSpecialty = "dermatology";
+}
+
+if (mappedSpecialty.includes("brain") || mappedSpecialty.includes("neuro")) {
+  mappedSpecialty = "neurology";
+}
+
+const doctor = doctors.find((doc) =>
+  doc.specialty.toLowerCase().includes(mappedSpecialty)
+);
     if (!doctor) {
       return NextResponse.json({
         doctor: "Dr. General",
@@ -56,7 +66,6 @@ export async function POST(req: Request) {
       });
     }
 
-    //  SUCCESS RESPONSE
     return NextResponse.json({
       doctor: doctor.name,
       specialty: doctor.specialty,
@@ -65,7 +74,7 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error("Error:", error);
 
-    //  FINAL FAILSAFE
+  
     return NextResponse.json({
       doctor: "Dr. Emergency",
       specialty: "General Medicine",
