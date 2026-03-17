@@ -28,18 +28,13 @@ export async function POST(req: Request) {
   });
 
   const data = await response.json();
-
-
-    if (!data || !data.choices || !data.choices[0]) {
-      return NextResponse.json({
-        doctor: "Dr. Default",
-        specialty: "General Medicine",
-        availability: "Available",
-      });
-    }
-
+  if (!data || !data.choices || !data.choices[0]) {
+  return NextResponse.json({
+    error: "AI response failed",
+  });
+}
    const specialty =
-  data.choices[0].message?.content?.trim() || "General Medicine";
+  data.choices[0].message?.content?.trim() || " ";
 
 
 let mappedSpecialty = specialty.toLowerCase();
@@ -58,7 +53,7 @@ if (mappedSpecialty.includes("heart") || mappedSpecialty.includes("cardio")) {
 
 
 const doctor = doctors.find((doc) =>
-  doc.specialty.toLowerCase().includes(mappedSpecialty)
+  doc.specialty.toLowerCase() === mappedSpecialty
 );
     if (!doctor) {
       return NextResponse.json({
