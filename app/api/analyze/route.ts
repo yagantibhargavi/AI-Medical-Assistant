@@ -46,10 +46,12 @@ let mappedSpecialty = specialty.toLowerCase();
 
 if (mappedSpecialty.includes("heart") || mappedSpecialty.includes("cardio")) {
   mappedSpecialty = "cardiology";
+  } else if (mappedSpecialty.includes("knee") || mappedSpecialty.includes("bone")) {
+  mappedSpecialty = "orthopedic";
 } else if (mappedSpecialty.includes("skin") || mappedSpecialty.includes("rash")) {
   mappedSpecialty = "dermatology";
-} else if (mappedSpecialty.includes("brain") || mappedSpecialty.includes("neuro")) {
-  mappedSpecialty = "neurology";
+} else if (mappedSpecialty.includes("eye") || mappedSpecialty.includes("eye")) {
+  mappedSpecialty = "ophthalmology";
 } else {
   mappedSpecialty = "general medicine";
 }
@@ -60,9 +62,9 @@ const doctor = doctors.find((doc) =>
 );
     if (!doctor) {
       return NextResponse.json({
-        doctor: "Dr. General",
+        doctor: "Dr. Hardin",
         specialty: mappedSpecialty,
-        availability: "Available",
+        availability: ["9:00AM", "1:00PM"],
       });
     }
 
@@ -76,9 +78,9 @@ const doctor = doctors.find((doc) =>
 
   
     return NextResponse.json({
-      doctor: "Dr. Emergency",
-      specialty: "General Medicine",
-      availability: "Available",
-    });
-  }
+      doctor: "Dr.Smith",
+      specialty: "mappedSpecialty",
+      availability:  ["9:00AM", "1:00PM"],
+  });
+}
 }

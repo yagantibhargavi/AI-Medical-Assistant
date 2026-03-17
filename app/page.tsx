@@ -120,35 +120,50 @@ const endVoiceCall = () => {
 };
 
 const handleSend = async () => {
-  if (!input.trim()) return;
+  if (!input) return;
 
-  const userMessage = input.toLowerCase();
+  try {
+    const res = await fetch("/api/analyze", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ message: input }),
+    });
 
-  const res = await fetch("/api/analyze", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({ message: input }),
-})
-
-const data = await res.json()
-
+    const data = await res.json();
+    console.log("API DATA:", data);
 let response = "";
 
-if (!data.doctor) {
-  response = "No matching doctor found.";
-} else {
-  response = `You should see ${data.doctor} (${data.specialty}). Available times: ${data.availability.join("\n")}`;
-  setSelectedDoctor(data);
-}
-  setMessages((prev) => [
-    ...prev,
-    { role: "user", content: input },
-    { role: "assistant", content: response }
-  ]);
+    if (data && data.doctor) {
+      response = `You should see ${data.doctor} (${data.specialty}).
+Available times: ${
+        Array.isArray(data.availability)
+          ? data.availability.join(", ")
+          : data.availability || "Not available"
+      }`;
 
-  setInput("");
+      setSelectedDoctor(data);
+    } else {
+      response = "No matching doctor found.";
+    }
+
+    setMessages((prev) => [
+      ...prev,
+      { role: "user", content: input },
+      { role: "assistant", content: response },
+    ]);
+
+    setInput("");
+  } catch (error) {
+    console.error("Error:", error);
+
+    setMessages((prev) => [
+      ...prev,
+      { role: "user", content: input },
+      { role: "assistant", content: "Something went wrong. Please try again." },
+    ]);
+  }
 };
 const handleBooking = async () => {
   if (!selectedDoctor) return;
@@ -218,10 +233,14 @@ Send
         <p className="font-semibold">Available Times:</p>
 
         <ul className="mb-3">
-          {selectedDoctor.availability.map((time: string, i: number) => (
-            <li key={i}>{time}</li>
-          ))}
-        </ul>
+  {Array.isArray(selectedDoctor?.availability) ? (
+    selectedDoctor.availability.map((time: string, i: number) => (
+      <li key={i}>{time}</li>
+    ))
+  ) : (
+    <li>{selectedDoctor?.availability || "No times available"}</li>
+  )}
+</ul>
         {appointment && (
   <div className="mt-6 p-4 border rounded bg-green-900 w-96">
 
