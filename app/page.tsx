@@ -140,9 +140,10 @@ if (!data.doctor) {
   response = "No matching doctor found.";
 } else {
   response = `You should see ${data.doctor} (${data.specialty}). Available times: ${data.availability.join("\n")}`;
+  setSelectedDoctor(data);
 }
-  setMessages([
-    ...messages,
+  setMessages((prev) => [
+    ...prev,
     { role: "user", content: input },
     { role: "assistant", content: response }
   ]);
@@ -180,7 +181,7 @@ return (
 <h2 className="text-xl mb-4">Welcome</h2>
 
 <div className="border p-4 h-48 mb-4">
-  {messages.map((m, i) => (
+  {messages?.map((m, i) => (
     <div key={i}>
       <b>{m.role === "assistant" ? "AI Assistant" : "You"}:</b> {m.content}
     </div>
