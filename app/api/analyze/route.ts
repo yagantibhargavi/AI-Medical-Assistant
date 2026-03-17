@@ -38,22 +38,22 @@ export async function POST(req: Request) {
       });
     }
 
-    const specialty =
+   const specialty =
   data.choices[0].message?.content?.trim() || "General Medicine";
 
-let mappedSpecialty = (specialty || "").toLowerCase();
+
+let mappedSpecialty = specialty.toLowerCase();
 
 if (mappedSpecialty.includes("heart") || mappedSpecialty.includes("cardio")) {
   mappedSpecialty = "cardiology";
-}
-
-if (mappedSpecialty.includes("skin")) {
+} else if (mappedSpecialty.includes("skin") || mappedSpecialty.includes("rash")) {
   mappedSpecialty = "dermatology";
+} else if (mappedSpecialty.includes("brain") || mappedSpecialty.includes("neuro")) {
+  mappedSpecialty = "neurology";
+} else {
+  mappedSpecialty = "general medicine";
 }
 
-if (mappedSpecialty.includes("brain") || mappedSpecialty.includes("neuro")) {
-  mappedSpecialty = "neurology";
-}
 
 const doctor = doctors.find((doc) =>
   doc.specialty.toLowerCase().includes(mappedSpecialty)
@@ -61,7 +61,7 @@ const doctor = doctors.find((doc) =>
     if (!doctor) {
       return NextResponse.json({
         doctor: "Dr. General",
-        specialty: specialty,
+        specialty: mappedSpecialty,
         availability: "Available",
       });
     }
