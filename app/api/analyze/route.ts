@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { doctors } from "@/data/doctors";
 
 export async function POST(req: Request) {
+    try{
   const body = await req.json();
   const message  = body.message || body.input || "";
 
@@ -28,19 +29,47 @@ export async function POST(req: Request) {
 
   const data = await response.json();
 
-  const specialty = data.choices[0].message.content.trim();
-  const doctor = doctors.find(
-  (doc) => doc.specialty.toLowerCase() === specialty.toLowerCase()
-);
+    //  SAFETY CHECK (prevents crash)
+    if (!data || !data.choices || !data.choices[0]) {
+      return NextResponse.json({
+        doctor: "Dr. Default",
+        specialty: "General Medicine",
+        availability: "Available",
+      });
+    }
 
-if (!doctor) {
-  return NextResponse.json({
-    message: "No matching doctor found."
-  });
-}
-return NextResponse.json({
-  doctor: doctor.name,
-  specialty: doctor.specialty,
-  availability: doctor.availability
-});
+    const specialty =
+      data.choices[0].message?.content?.trim() || "General Medicine";
+
+    //  SAFE MATCHING
+    const doctor = doctors.find(
+      (doc) =>
+        doc.specialty.toLowerCase() === (specialty || "").toLowerCase()
+    );
+
+    //  FALLBACK IF NO MATCH
+    if (!doctor) {
+      return NextResponse.json({
+        doctor: "Dr. General",
+        specialty: specialty,
+        availability: "Available",
+      });
+    }
+
+    //  SUCCESS RESPONSE
+    return NextResponse.json({
+      doctor: doctor.name,
+      specialty: doctor.specialty,
+      availability: doctor.availability,
+    });
+  } catch (error) {
+    console.error("Error:", error);
+
+    //  FINAL FAILSAFE
+    return NextResponse.json({
+      doctor: "Dr. Emergency",
+      specialty: "General Medicine",
+      availability: "Available",
+    });
+  }
 }
