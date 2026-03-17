@@ -139,7 +139,7 @@ let response = "";
 if (!data.doctor) {
   response = "No matching doctor found.";
 } else {
-  response = `You should see ${data.doctor} (${data.specialty}). Available times: ${data.availability.join("/n")}`;
+  response = `You should see ${data.doctor} (${data.specialty}). Available times: ${data.availability.join("\n")}`;
 }
   setMessages([
     ...messages,
