@@ -136,10 +136,10 @@ const data = await res.json()
 
 let response = "";
 
-if (data.doctor) {
-  const response = `You should see ${data.doctor} (${data.specialty}). Availability: ${data.availability}`;
+if (!data.doctor) {
+  response = "No matching doctor found.";
 } else {
-  response = "Assigned to General Doctor";
+  response = `You should see ${data.doctor} (${data.specialty}). Available times: ${data.availability.join("/n")}`;
 }
   setMessages([
     ...messages,
