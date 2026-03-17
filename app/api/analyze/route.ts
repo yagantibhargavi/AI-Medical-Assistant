@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { doctors } from "@/data/doctors";
 
 export async function POST(req: Request) {
   const { message } = await req.json();
@@ -27,6 +28,18 @@ export async function POST(req: Request) {
   const data = await response.json();
 
   const specialty = data.choices[0].message.content.trim();
+  const doctor = doctors.find(
+  (doc) => doc.specialty.toLowerCase() === specialty.toLowerCase()
+);
 
-  return NextResponse.json({ specialty });
+if (!doctor) {
+  return NextResponse.json({
+    message: "No matching doctor found."
+  });
+}
+return NextResponse.json({
+  doctor: doctor.name,
+  specialty: doctor.specialty,
+  availability: doctor.availability
+});
 }

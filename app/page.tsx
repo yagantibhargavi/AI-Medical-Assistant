@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { doctors } from "../data/doctors";
+import Vapi from "@vapi-ai/web";
 
 export default function Home() {
 
@@ -23,6 +24,18 @@ export default function Home() {
 const [input, setInput] = useState("");
 const [selectedDoctor, setSelectedDoctor] = useState<any>(null);
 const [appointment, setAppointment] = useState<any>(null);
+const vapi = new Vapi(process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY!);
+
+const startVoiceCall = () => {
+  vapi.start(process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID!, {
+    metadata: {
+      chatHistory: messages
+    }
+  });
+};
+const endVoiceCall = () => {
+  vapi.stop();
+};
 
  const handleSubmit = () => {
     setPatient(form);
@@ -141,15 +154,28 @@ if (doctor) {
 
   setInput("");
 };
-
-const handleBooking = () => {
+const handleBooking = async () => {
   if (!selectedDoctor) return;
 
   const time = selectedDoctor.availability[0];
 
-  setAppointment({
+  const newAppointment = {
     doctor: selectedDoctor.name,
     time: time
+  };
+
+  setAppointment(newAppointment);
+
+  await fetch("/api/send-email", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      email: "bhargavi.developer99@gmail.com",
+      doctor: newAppointment.doctor,
+      time: newAppointment.time
+    })
   });
 };
 
@@ -208,9 +234,21 @@ Send
     </h2>
 
     <p>Doctor: {appointment.doctor}</p>
-
     <p>Time: {appointment.time}</p>
 
+    <button
+ onClick={startVoiceCall}
+ className="bg-purple-600 text-white px-4 py-2 mt-3 rounded"
+>
+ Continue by Voice
+</button>
+
+<button
+  onClick={endVoiceCall}
+  className="bg-red-600 px-4 py-2 mt-2 rounded text-white"
+>
+  End Voice Call
+</button>
   </div>
 )}
 
