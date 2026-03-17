@@ -53,7 +53,7 @@ if (mappedSpecialty.includes("heart") || mappedSpecialty.includes("cardio")) {
 
 
 const doctor = doctors.find((doc) =>
-  doc.specialty.toLowerCase() === mappedSpecialty
+  doc.specialty.toLowerCase().includes(mappedSpecialty)
 );
     if (!doctor) {
       return NextResponse.json({
