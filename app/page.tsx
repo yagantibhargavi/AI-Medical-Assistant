@@ -134,17 +134,12 @@ const handleSend = async () => {
 
 const data = await res.json()
 
-const doctor = doctors.find(
-  (d) => d.specialty.toLowerCase().includes(data.specialty)
-);
-let response = "No matching doctor found.";
+let response = "";
 
-if (doctor) {
-  setSelectedDoctor(doctor)
-
-  response =
-    `You should see ${doctor.name} (${doctor.specialty}).\n\nAvailable times:\n` +
-    doctor.availability.join("\n")
+if (data.doctor) {
+  const response = `You should see ${data.doctor} (${data.specialty}). Availability: ${data.availability}`;
+} else {
+  response = "Assigned to General Doctor";
 }
   setMessages([
     ...messages,
