@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { doctors } from "@/data/doctors";
 
 export async function POST(req: Request) {
-  const { message } = await req.json();
+  const body = await req.json();
+  const message  = body.message || body.input || "";
 
   const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
